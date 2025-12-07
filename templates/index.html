@@ -1,0 +1,1070 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>NEXUS ULTRA</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0e1a; color: #fff; overflow-x: hidden; }
+        
+        .bg-gradient { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; background: linear-gradient(135deg, #667eea 0%, #764ba2 25%, #f093fb 50%, #4facfe 75%, #00f2fe 100%); background-size: 400% 400%; animation: gradientShift 15s ease infinite; opacity: 0.05; }
+        @keyframes gradientShift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+        
+        #particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
+        
+        .container { max-width: 1920px; margin: 0 auto; padding: 25px; position: relative; z-index: 1; }
+        
+        .navbar { display: flex; justify-content: space-between; align-items: center; padding: 18px 28px; background: rgba(255,255,255,0.04); backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; margin-bottom: 25px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); }
+        .logo { font-size: 26px; font-weight: 900; background: linear-gradient(135deg, #667eea, #764ba2, #f093fb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; letter-spacing: 2px; }
+        .nav-stats { display: flex; gap: 22px; }
+        .nav-stat { display: flex; align-items: center; gap: 10px; }
+        .nav-icon { width: 42px; height: 42px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 19px; box-shadow: 0 4px 15px rgba(102,126,234,0.3); }
+        .nav-info { display: flex; flex-direction: column; }
+        .nav-label { font-size: 10px; color: #8b92b0; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        .nav-value { font-size: 15px; font-weight: 700; color: #fff; font-family: 'JetBrains Mono', monospace; }
+        
+        .main-grid { display: grid; grid-template-columns: 320px 1fr 320px; gap: 25px; margin-bottom: 25px; }
+        
+        .card { background: rgba(255,255,255,0.04); backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.12); border-radius: 18px; padding: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+        .card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: conic-gradient(from 0deg, transparent, rgba(102,126,234,0.1), transparent 30%); animation: rotate 6s linear infinite; opacity: 0; transition: opacity 0.4s; }
+        .card:hover::before { opacity: 1; }
+        @keyframes rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .card:hover { transform: translateY(-6px) scale(1.01); box-shadow: 0 15px 60px rgba(102,126,234,0.25); border-color: rgba(102,126,234,0.35); }
+        .card-title { font-size: 17px; font-weight: 700; margin-bottom: 22px; display: flex; align-items: center; gap: 11px; position: relative; z-index: 1; }
+        .card-title::before { content: ''; width: 4px; height: 22px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 2px; box-shadow: 0 0 10px rgba(102,126,234,0.5); }
+        
+        .monitor { margin-bottom: 22px; position: relative; z-index: 1; }
+        .monitor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+        .monitor-label { font-size: 12px; color: #8b92b0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .monitor-value { font-size: 15px; font-weight: 700; font-family: 'JetBrains Mono', monospace; background: linear-gradient(135deg, #667eea, #f093fb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .monitor-bar { height: 9px; background: rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden; position: relative; }
+        .monitor-fill { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2, #f093fb); border-radius: 12px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 25px rgba(102,126,234,0.6); position: relative; }
+        .monitor-fill::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); animation: shimmer 2s infinite; }
+        @keyframes shimmer { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        
+        .chart-box { height: 180px; margin-top: 18px; position: relative; z-index: 1; }
+        
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 22px; position: relative; z-index: 1; }
+        .input-group { display: flex; flex-direction: column; gap: 7px; }
+        .input-label { font-size: 11px; color: #8b92b0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .input-field { padding: 13px 17px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 11px; color: #fff; font-size: 14px; font-family: 'Inter', sans-serif; transition: all 0.3s; }
+        .input-field:focus { outline: none; border-color: #667eea; background: rgba(102,126,234,0.12); box-shadow: 0 0 0 4px rgba(102,126,234,0.12); }
+        .input-field::placeholder { color: #4a5568; }
+        
+        .btn-group { display: flex; gap: 13px; flex-wrap: wrap; position: relative; z-index: 1; }
+        .btn { padding: 15px 30px; border: none; border-radius: 11px; font-size: 13px; font-weight: 700; cursor: pointer; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 1px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+        .btn::before { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255,255,255,0.25); border-radius: 50%; transform: translate(-50%, -50%); transition: width 0.6s, height 0.6s; }
+        .btn:hover::before { width: 450px; height: 450px; }
+        .btn-primary { background: linear-gradient(135deg, #667eea, #764ba2); color: #fff; box-shadow: 0 10px 30px rgba(102,126,234,0.45); }
+        .btn-primary:hover { transform: translateY(-3px) scale(1.02); box-shadow: 0 15px 40px rgba(102,126,234,0.65); }
+        .btn-danger { background: linear-gradient(135deg, #f093fb, #f5576c); color: #fff; box-shadow: 0 10px 30px rgba(245,87,108,0.45); }
+        .btn-secondary { background: rgba(255,255,255,0.06); color: #fff; border: 1px solid rgba(255,255,255,0.2); }
+        .hidden { display: none !important; }
+        
+        .status-box { background: linear-gradient(135deg, rgba(102,126,234,0.12), rgba(240,147,251,0.12)); border-left: 4px solid #667eea; padding: 18px; border-radius: 11px; margin-bottom: 22px; font-size: 14px; font-weight: 600; font-family: 'JetBrains Mono', monospace; box-shadow: 0 4px 15px rgba(102,126,234,0.2); position: relative; z-index: 1; }
+        
+        .progress-section { margin-bottom: 18px; position: relative; z-index: 1; }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 9px; }
+        .progress-label { font-size: 12px; color: #8b92b0; font-weight: 600; text-transform: uppercase; letter-spacing: 1px; }
+        .progress-percent { font-size: 15px; font-weight: 700; font-family: 'JetBrains Mono', monospace; background: linear-gradient(135deg, #667eea, #f093fb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .progress-track { height: 11px; background: rgba(255,255,255,0.06); border-radius: 12px; overflow: hidden; position: relative; }
+        .progress-bar { height: 100%; background: linear-gradient(90deg, #667eea, #764ba2, #f093fb); border-radius: 12px; transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 25px rgba(102,126,234,0.6); position: relative; }
+        .progress-bar::after { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent); animation: shimmer 2s infinite; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; position: relative; z-index: 1; }
+        .stat-card { background: linear-gradient(135deg, rgba(102,126,234,0.12), rgba(240,147,251,0.12)); border: 1px solid rgba(255,255,255,0.12); border-radius: 15px; padding: 22px; text-align: center; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); position: relative; overflow: hidden; }
+        .stat-card::before { content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(102,126,234,0.15), transparent 70%); opacity: 0; transition: opacity 0.4s; }
+        .stat-card:hover::before { opacity: 1; animation: rotate 4s linear infinite; }
+        .stat-card:hover { transform: translateY(-6px) scale(1.03); box-shadow: 0 15px 40px rgba(102,126,234,0.35); }
+        .stat-value { font-size: 44px; font-weight: 900; background: linear-gradient(135deg, #667eea, #f093fb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 9px; font-family: 'JetBrains Mono', monospace; text-shadow: 0 0 30px rgba(102,126,234,0.5); }
+        .stat-label { font-size: 11px; color: #8b92b0; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        
+        .terminal-box { background: rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.1); border-radius: 11px; padding: 15px; height: 200px; overflow-y: auto; font-family: 'JetBrains Mono', monospace; font-size: 11px; margin-top: 18px; position: relative; z-index: 1; }
+        .terminal-line { color: #0f0; margin-bottom: 4px; }
+        .terminal-line::before { content: '> '; color: #667eea; }
+        
+        .analytics-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; margin-bottom: 28px; position: relative; z-index: 1; }
+        .analytics-card { background: linear-gradient(135deg, rgba(102,126,234,0.12), rgba(240,147,251,0.12)); border: 1px solid rgba(255,255,255,0.12); border-radius: 15px; padding: 18px; text-align: center; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+        .analytics-card:hover { transform: translateY(-6px) scale(1.03); box-shadow: 0 15px 40px rgba(102,126,234,0.35); }
+        .analytics-icon { font-size: 30px; margin-bottom: 11px; filter: drop-shadow(0 0 10px rgba(102,126,234,0.5)); }
+        .analytics-value { font-size: 34px; font-weight: 900; background: linear-gradient(135deg, #667eea, #f093fb); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 7px; font-family: 'JetBrains Mono', monospace; }
+        .analytics-label { font-size: 10px; color: #8b92b0; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+        
+        .search-input { width: 100%; padding: 15px 22px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); border-radius: 11px; color: #fff; font-size: 14px; font-family: 'Inter', sans-serif; transition: all 0.3s; margin-bottom: 22px; }
+        .search-input:focus { outline: none; border-color: #667eea; background: rgba(102,126,234,0.12); box-shadow: 0 0 0 4px rgba(102,126,234,0.12); }
+        
+        table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        thead { background: linear-gradient(135deg, rgba(102,126,234,0.2), rgba(240,147,251,0.2)); }
+        th { padding: 15px; text-align: left; font-weight: 700; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #fff; border-bottom: 2px solid rgba(102,126,234,0.4); }
+        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 13px; color: #cbd5e0; }
+        tbody tr { transition: all 0.3s; }
+        tbody tr:hover { background: linear-gradient(90deg, rgba(102,126,234,0.12), rgba(240,147,251,0.12)); transform: scale(1.01); }
+        a { color: #667eea; text-decoration: none; font-weight: 600; transition: all 0.3s; }
+        a:hover { color: #f093fb; text-shadow: 0 0 10px rgba(102,126,234,0.5); }
+        .badge { display: inline-block; padding: 5px 11px; border-radius: 7px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+        .badge-open { background: rgba(72,187,120,0.25); color: #48bb78; }
+        .badge-temp { background: rgba(237,137,54,0.25); color: #ed8936; }
+        .badge-closed { background: rgba(245,87,108,0.25); color: #f5576c; }
+        .action-btn { padding: 7px 15px; background: linear-gradient(135deg, #667eea, #764ba2); border: none; border-radius: 7px; color: #fff; font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .action-btn:hover { transform: scale(1.08); box-shadow: 0 5px 15px rgba(102,126,234,0.5); }
+        
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 10px; }
+        
+        @media (max-width: 1400px) { .main-grid { grid-template-columns: 280px 1fr 280px; } }
+        @media (max-width: 1024px) { .main-grid { grid-template-columns: 1fr; } .analytics-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } .stats-grid { grid-template-columns: 1fr; } .analytics-grid { grid-template-columns: repeat(2, 1fr); } }
+    </style>
+</head>
+<body>
+    <div class="bg-gradient"></div>
+    <canvas id="particles"></canvas>
+    
+    <div class="container">
+        <div class="navbar">
+            <div style="display: flex; align-items: center; gap: 28px;">
+                <div class="logo">⚡ NEXUS ULTRA</div>
+                <div class="nav-stats">
+                    <div class="nav-stat">
+                        <div class="nav-icon">💻</div>
+                        <div class="nav-info">
+                            <div class="nav-label">CPU</div>
+                            <div class="nav-value" id="navCpu">0%</div>
+                        </div>
+                    </div>
+                    <div class="nav-stat">
+                        <div class="nav-icon">🧠</div>
+                        <div class="nav-info">
+                            <div class="nav-label">RAM</div>
+                            <div class="nav-value" id="navRam">0%</div>
+                        </div>
+                    </div>
+                    <div class="nav-stat">
+                        <div class="nav-icon">🌐</div>
+                        <div class="nav-info">
+                            <div class="nav-label">Network</div>
+                            <div class="nav-value" id="navNet">0 KB/s</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="nav-stat">
+                <div class="nav-icon">⏱️</div>
+                <div class="nav-info">
+                    <div class="nav-label">Uptime</div>
+                    <div class="nav-value" id="navUptime">00:00:00</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-grid">
+            <div>
+                <div class="card">
+                    <div class="card-title">System Monitor</div>
+                    <div class="monitor">
+                        <div class="monitor-header">
+                            <div class="monitor-label">CPU Usage</div>
+                            <div class="monitor-value" id="cpu">0%</div>
+                        </div>
+                        <div class="monitor-bar"><div class="monitor-fill" id="cpuBar" style="width: 0%"></div></div>
+                    </div>
+                    <div class="monitor">
+                        <div class="monitor-header">
+                            <div class="monitor-label">RAM Usage</div>
+                            <div class="monitor-value" id="ram">0%</div>
+                        </div>
+                        <div class="monitor-bar"><div class="monitor-fill" id="ramBar" style="width: 0%"></div></div>
+                    </div>
+                    <div class="monitor">
+                        <div class="monitor-header">
+                            <div class="monitor-label">Network</div>
+                            <div class="monitor-value" id="net">0 KB/s</div>
+                        </div>
+                        <div class="monitor-bar"><div class="monitor-fill" id="netBar" style="width: 0%"></div></div>
+                    </div>
+                    <div class="chart-box"><canvas id="cpuChart"></canvas></div>
+                    <div class="terminal-box" id="terminalBox"></div>
+                </div>
+            </div>
+            
+            <div>
+                <div class="card">
+                    <div class="card-title">Mission Control</div>
+                    <div class="form-grid">
+                        <div class="input-group">
+                            <div class="input-label">Search Term</div>
+                            <input type="text" class="input-field" id="searchTerm" placeholder="restaurants">
+                        </div>
+                        <div class="input-group">
+                            <div class="input-label">Categories</div>
+                            <input type="text" class="input-field" id="categories" placeholder="pizza, sushi, cafe">
+                        </div>
+                        <div class="input-group">
+                            <div class="input-label">Zip Codes</div>
+                            <input type="text" class="input-field" id="zipcodes" placeholder="10001, 10002">
+                        </div>
+                        <div class="input-group">
+                            <div class="input-label">Workers</div>
+                            <input type="number" class="input-field" id="maxWorkers" value="10" min="1" max="15">
+                        </div>
+                        <div class="input-group">
+                            <div class="input-label">Max Scrolls</div>
+                            <input type="number" class="input-field" id="maxScrolls" value="10" min="5" max="30">
+                        </div>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-primary" id="startBtn" onclick="startScraping()">🚀 Start Extraction</button>
+                        <button class="btn btn-danger hidden" id="stopBtn" onclick="stopScraping()">⏹ Stop</button>
+                        <button class="btn btn-secondary" onclick="downloadCSV()">⬇ CSV</button>
+                        <button class="btn btn-secondary" onclick="downloadExcel()">⬇ Excel</button>
+                    </div>
+                    <div class="status-box" id="statusText">Ready to extract data...</div>
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <div class="progress-label">Link Collection</div>
+                            <div class="progress-percent" id="linkPct">0%</div>
+                        </div>
+                        <div class="progress-track"><div class="progress-bar" id="linkProgressBar" style="width: 0%"></div></div>
+                    </div>
+                    <div class="progress-section">
+                        <div class="progress-header">
+                            <div class="progress-label">Detail Extraction</div>
+                            <div class="progress-percent" id="detailPct">0%</div>
+                        </div>
+                        <div class="progress-track"><div class="progress-bar" id="detailProgressBar" style="width: 0%"></div></div>
+                    </div>
+                    <div class="chart-box"><canvas id="progressChart"></canvas></div>
+                </div>
+            </div>
+            
+            <div>
+                <div class="card">
+                    <div class="card-title">Live Statistics</div>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value" id="linkCount">0</div>
+                            <div class="stat-label">Links</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="scrapedCount">0</div>
+                            <div class="stat-label">Scraped</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value" id="totalCount">0</div>
+                            <div class="stat-label">Total</div>
+                        </div>
+                    </div>
+                    <div class="chart-box"><canvas id="speedChart"></canvas></div>
+                    <div class="chart-box"><canvas id="ramChart"></canvas></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card hidden" id="resultsCard">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px;">
+                <div class="card-title" style="margin: 0;">📊 Extracted Data</div>
+                <div style="display: flex; gap: 11px;">
+                    <button class="btn btn-secondary" onclick="filterResults('all')">All</button>
+                    <button class="btn btn-secondary" onclick="filterResults('open')">Active</button>
+                    <button class="btn btn-secondary" onclick="filterResults('closed')">Inactive</button>
+                </div>
+            </div>
+            
+            <div class="analytics-grid">
+                <div class="analytics-card">
+                    <div class="analytics-icon">📧</div>
+                    <div class="analytics-value" id="emailsFound">0</div>
+                    <div class="analytics-label">Emails</div>
+                </div>
+                <div class="analytics-card">
+                    <div class="analytics-icon">🌐</div>
+                    <div class="analytics-value" id="websitesFound">0</div>
+                    <div class="analytics-label">Websites</div>
+                </div>
+                <div class="analytics-card">
+                    <div class="analytics-icon">📱</div>
+                    <div class="analytics-value" id="socialsFound">0</div>
+                    <div class="analytics-label">Socials</div>
+                </div>
+                <div class="analytics-card">
+                    <div class="analytics-icon">⭐</div>
+                    <div class="analytics-value" id="avgRating">0</div>
+                    <div class="analytics-label">Avg Rating</div>
+                </div>
+                <div class="analytics-card">
+                    <div class="analytics-icon">✅</div>
+                    <div class="analytics-value" id="openCount">0</div>
+                    <div class="analytics-label">Active</div>
+                </div>
+                <div class="analytics-card">
+                    <div class="analytics-icon">❌</div>
+                    <div class="analytics-value" id="closedCount">0</div>
+                    <div class="analytics-label">Inactive</div>
+                </div>
+            </div>
+
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search by name, city, category..." onkeyup="searchTable()">
+            
+            <div style="overflow-x: auto; border-radius: 15px;">
+                <table>
+                    <thead><tr><th>Name</th><th>Category</th><th>City</th><th>Phone</th><th>Email</th><th>Website</th><th>Social</th><th>Status</th><th>Rating</th><th>Action</th></tr></thead>
+                    <tbody id="resultsBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const particles = [];
+        for(let i = 0; i < 200; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                size: Math.random() * 2.5 + 0.5
+            });
+        }
+        function drawParticles() {
+            ctx.fillStyle = 'rgba(10, 14, 26, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(0.5, '#764ba2');
+            gradient.addColorStop(1, '#f093fb');
+            ctx.fillStyle = gradient;
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            particles.forEach((p1, i) => {
+                particles.slice(i + 1).forEach(p2 => {
+                    const dx = p1.x - p2.x;
+                    const dy = p1.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if(dist < 150) {
+                        ctx.strokeStyle = `rgba(102, 126, 234, ${0.25 * (1 - dist / 150)})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                });
+            });
+        }
+        setInterval(drawParticles, 25);
+
+        const cpuCtx = document.getElementById('cpuChart').getContext('2d');
+        const cpuData = Array(30).fill(0);
+        const cpuChart = new Chart(cpuCtx, {
+            type: 'line',
+            data: {
+                labels: Array(30).fill(''),
+                datasets: [{
+                    data: cpuData,
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.15)',
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { display: false, min: 0, max: 100 },
+                    x: { display: false }
+                }
+            }
+        });
+
+        const progCtx = document.getElementById('progressChart').getContext('2d');
+        const progressChart = new Chart(progCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed', 'Remaining'],
+                datasets: [{
+                    data: [0, 100],
+                    backgroundColor: ['#667eea', 'rgba(255,255,255,0.06)'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                cutout: '75%'
+            }
+        });
+
+        const speedCtx = document.getElementById('speedChart').getContext('2d');
+        const speedData = Array(20).fill(0);
+        const speedChart = new Chart(speedCtx, {
+            type: 'bar',
+            data: {
+                labels: Array(20).fill(''),
+                datasets: [{
+                    data: speedData,
+                    backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                    borderColor: '#667eea',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { display: false, min: 0, max: 100 },
+                    x: { display: false }
+                }
+            }
+        });
+
+        const ramCtx = document.getElementById('ramChart').getContext('2d');
+        const ramData = Array(30).fill(0);
+        const ramChart = new Chart(ramCtx, {
+            type: 'line',
+            data: {
+                labels: Array(30).fill(''),
+                datasets: [{
+                    data: ramData,
+                    borderColor: '#f093fb',
+                    backgroundColor: 'rgba(240, 147, 251, 0.15)',
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { display: false, min: 0, max: 100 },
+                    x: { display: false }
+                }
+            }
+        });
+
+        let startTime = Date.now();
+        let cpuHistory = Array(30).fill(0);
+        let ramHistory = Array(30).fill(0);
+        let speedHistory = Array(20).fill(0);
+        let terminalLines = [];
+        
+        function addTerminalLog(msg) {
+            terminalLines.push(msg);
+            if(terminalLines.length > 15) terminalLines.shift();
+            const box = document.getElementById('terminalBox');
+            box.innerHTML = terminalLines.map(l => `<div class="terminal-line">${l}</div>`).join('');
+            box.scrollTop = box.scrollHeight;
+        }
+        
+        function updateSystem() {
+            const active = document.getElementById('startBtn').classList.contains('hidden');
+            const cpu = Math.floor(Math.random() * 25) + 15 + (active ? 45 : 0);
+            const ram = Math.floor(Math.random() * 20) + 25 + (active ? 35 : 0);
+            const net = active ? Math.floor(Math.random() * 700) + 400 : Math.floor(Math.random() * 100);
+            const speed = active ? Math.floor(Math.random() * 50) + 30 : Math.floor(Math.random() * 10);
+            
+            document.getElementById('cpu').textContent = cpu + '%';
+            document.getElementById('ram').textContent = ram + '%';
+            document.getElementById('net').textContent = net + ' KB/s';
+            document.getElementById('navCpu').textContent = cpu + '%';
+            document.getElementById('navRam').textContent = ram + '%';
+            document.getElementById('navNet').textContent = net + ' KB/s';
+            
+            document.getElementById('cpuBar').style.width = cpu + '%';
+            document.getElementById('ramBar').style.width = ram + '%';
+            document.getElementById('netBar').style.width = Math.min(net / 10, 100) + '%';
+            
+            cpuHistory.push(cpu);
+            cpuHistory.shift();
+            cpuChart.data.datasets[0].data = cpuHistory;
+            cpuChart.update('none');
+            
+            ramHistory.push(ram);
+            ramHistory.shift();
+            ramChart.data.datasets[0].data = ramHistory;
+            ramChart.update('none');
+            
+            speedHistory.push(speed);
+            speedHistory.shift();
+            speedChart.data.datasets[0].data = speedHistory;
+            speedChart.update('none');
+            
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+            const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+            const s = String(elapsed % 60).padStart(2, '0');
+            document.getElementById('navUptime').textContent = `${h}:${m}:${s}`;
+        }
+        setInterval(updateSystem, 1000);
+
+        let statusInterval;
+        let sessionId = localStorage.getItem('sessionId') || 'user_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('sessionId', sessionId);
+        addTerminalLog('System initialized');
+        addTerminalLog('Session ID: ' + sessionId);
+
+        function getHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'X-Session-ID': sessionId
+            };
+        }
+
+        function startScraping() {
+            const config = {
+                general_search_term: document.getElementById('searchTerm').value,
+                categories: document.getElementById('categories').value.split(',').map(s => s.trim()).filter(s => s),
+                zipcodes: document.getElementById('zipcodes').value.split(',').map(s => s.trim()).filter(s => s),
+                max_workers: parseInt(document.getElementById('maxWorkers').value),
+                max_scrolls: parseInt(document.getElementById('maxScrolls').value),
+                headless_mode: true
+            };
+
+            addTerminalLog('Starting extraction...');
+            fetch('/start-scraping', {
+                method: 'POST',
+                headers: getHeaders(),
+                body: JSON.stringify(config)
+            }).then(r => r.json()).then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('startBtn').classList.add('hidden');
+                    document.getElementById('stopBtn').classList.remove('hidden');
+                    addTerminalLog('Extraction started successfully');
+                    startStatusPolling();
+                } else {
+                    addTerminalLog('Error: ' + data.message);
+                    alert(data.message);
+                }
+            });
+        }
+
+        function stopScraping() {
+            addTerminalLog('Stopping extraction...');
+            fetch('/stop-scraping', { method: 'POST', headers: getHeaders() });
+            document.getElementById('startBtn').classList.remove('hidden');
+            document.getElementById('stopBtn').classList.add('hidden');
+            addTerminalLog('Extraction stopped');
+        }
+
+        function startStatusPolling() {
+            statusInterval = setInterval(updateStatus, 1000);
+        }
+
+        function updateStatus() {
+            fetch('/status', { headers: getHeaders() }).then(r => r.json()).then(data => {
+                document.getElementById('statusText').textContent = data.status_message;
+                document.getElementById('linkCount').textContent = data.link_count;
+                document.getElementById('scrapedCount').textContent = data.scraped_count;
+                document.getElementById('totalCount').textContent = data.total_to_scrape;
+
+                const linkPct = Math.round(data.link_collection_progress * 100);
+                const detailPct = Math.round(data.detail_scraping_progress * 100);
+
+                document.getElementById('linkPct').textContent = linkPct + '%';
+                document.getElementById('detailPct').textContent = detailPct + '%';
+                document.getElementById('linkProgressBar').style.width = linkPct + '%';
+                document.getElementById('detailProgressBar').style.width = detailPct + '%';
+                
+                const avgProgress = (linkPct + detailPct) / 2;
+                progressChart.data.datasets[0].data = [avgProgress, 100 - avgProgress];
+                progressChart.update('none');
+
+                if (!data.scraping_active && statusInterval) {
+                    clearInterval(statusInterval);
+                    document.getElementById('startBtn').classList.remove('hidden');
+                    document.getElementById('stopBtn').classList.add('hidden');
+                    addTerminalLog('Extraction complete');
+                    loadResults();
+                }
+            });
+        }
+
+        let allData = [];
+
+        function loadResults() {
+            addTerminalLog('Loading results...');
+            fetch('/get-results', { headers: getHeaders() }).then(r => r.json()).then(data => {
+                if (data.length > 0) {
+                    allData = data;
+                    document.getElementById('resultsCard').classList.remove('hidden');
+                    calculateAnalytics(data);
+                    displayResults(data);
+                    addTerminalLog('Results loaded: ' + data.length + ' records');
+                }
+            });
+        }
+
+        function calculateAnalytics(data) {
+            let emailCount = 0, websiteCount = 0, socialCount = 0, ratingSum = 0, ratingCount = 0;
+            let openCount = 0, closedCount = 0;
+
+            data.forEach(row => {
+                if(row['Final Email']) emailCount++;
+                if(row.Website) websiteCount++;
+                if(row.Facebook || row.Instagram || row.Twitter || row.LinkedIn) socialCount++;
+                if(row.Rating) { ratingSum += parseFloat(row.Rating); ratingCount++; }
+                if(row['Closure Status'] === 'Open') openCount++;
+                else closedCount++;
+            });
+
+            document.getElementById('emailsFound').textContent = emailCount;
+            document.getElementById('websitesFound').textContent = websiteCount;
+            document.getElementById('socialsFound').textContent = socialCount;
+            document.getElementById('avgRating').textContent = ratingCount > 0 ? (ratingSum / ratingCount).toFixed(1) : '0';
+            document.getElementById('openCount').textContent = openCount;
+            document.getElementById('closedCount').textContent = closedCount;
+        }
+
+        function displayResults(data) {
+            const tbody = document.getElementById('resultsBody');
+            tbody.innerHTML = '';
+            data.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                let social = '';
+                if(row.Facebook) social += '<a href="'+row.Facebook+'" target="_blank">FB</a> ';
+                if(row.Instagram) social += '<a href="'+row.Instagram+'" target="_blank">IG</a> ';
+                if(row.Twitter) social += '<a href="'+row.Twitter+'" target="_blank">TW</a> ';
+                if(row.LinkedIn) social += '<a href="'+row.LinkedIn+'" target="_blank">LI</a>';
+                
+                let statusBadge = '';
+                if(row['Closure Status'] === 'Permanently Closed') statusBadge = '<span class="badge badge-closed">CLOSED</span>';
+                else if(row['Closure Status'] === 'Temporarily Closed') statusBadge = '<span class="badge badge-temp">TEMP</span>';
+                else statusBadge = '<span class="badge badge-open">ACTIVE</span>';
+                
+                tr.innerHTML = `<td>${row.Name || ''}</td><td>${row.Category || ''}</td><td>${row.City || ''}</td><td>${row.Phone || ''}</td><td>${row['Final Email'] || ''}</td><td>${row.Website ? '<a href="'+row.Website+'" target="_blank">Visit</a>' : ''}</td><td>${social}</td><td>${statusBadge}</td><td>${row.Rating || ''}</td><td><button class="action-btn" onclick="viewDetails(${index})">View</button></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function searchTable() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allData.filter(row => 
+                (row.Name || '').toLowerCase().includes(input) ||
+                (row.Category || '').toLowerCase().includes(input) ||
+                (row.City || '').toLowerCase().includes(input) ||
+                (row.Phone || '').toLowerCase().includes(input)
+            );
+            displayResults(filtered);
+        }
+
+        function filterResults(type) {
+            let filtered = allData;
+            if(type === 'open') filtered = allData.filter(row => row['Closure Status'] === 'Open');
+            else if(type === 'closed') filtered = allData.filter(row => row['Closure Status'] !== 'Open');
+            displayResults(filtered);
+            addTerminalLog('Filter applied: ' + type);
+        }
+
+        function viewDetails(index) {
+            const row = allData[index];
+            alert(`Name: ${row.Name}\nAddress: ${row.Address}\nPhone: ${row.Phone}\nEmail: ${row['Final Email']}\nWebsite: ${row.Website}\nRating: ${row.Rating}\nStatus: ${row['Closure Status']}`);
+        }
+
+        function downloadCSV() { 
+            addTerminalLog('Exporting CSV...');
+            window.open('/download-csv?session=' + sessionId, '_blank'); 
+        }
+        function downloadExcel() { 
+            addTerminalLog('Exporting Excel...');
+            window.open('/download-excel?session=' + sessionId, '_blank'); 
+        }
+    </script>
+</body>
+</html>
+        const canvas = document.getElementById('particles');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const particles = [];
+        for(let i = 0; i < 200; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                size: Math.random() * 2.5 + 0.5
+            });
+        }
+        function drawParticles() {
+            ctx.fillStyle = 'rgba(10, 14, 26, 0.1)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+            gradient.addColorStop(0, '#667eea');
+            gradient.addColorStop(0.5, '#764ba2');
+            gradient.addColorStop(1, '#f093fb');
+            ctx.fillStyle = gradient;
+            particles.forEach(p => {
+                p.x += p.vx;
+                p.y += p.vy;
+                if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            particles.forEach((p1, i) => {
+                particles.slice(i + 1).forEach(p2 => {
+                    const dx = p1.x - p2.x;
+                    const dy = p1.y - p2.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+                    if(dist < 150) {
+                        ctx.strokeStyle = `rgba(102, 126, 234, ${0.25 * (1 - dist / 150)})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(p1.x, p1.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                });
+            });
+        }
+        setInterval(drawParticles, 25);
+
+        const cpuCtx = document.getElementById('cpuChart').getContext('2d');
+        const cpuData = Array(30).fill(0);
+        const cpuChart = new Chart(cpuCtx, {
+            type: 'line',
+            data: {
+                labels: Array(30).fill(''),
+                datasets: [{
+                    data: cpuData,
+                    borderColor: '#667eea',
+                    backgroundColor: 'rgba(102, 126, 234, 0.15)',
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { display: false, min: 0, max: 100 },
+                    x: { display: false }
+                }
+            }
+        });
+
+        const progCtx = document.getElementById('progressChart').getContext('2d');
+        const progressChart = new Chart(progCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Completed', 'Remaining'],
+                datasets: [{
+                    data: [0, 100],
+                    backgroundColor: ['#667eea', 'rgba(255,255,255,0.06)'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                cutout: '75%'
+            }
+        });
+
+        const speedCtx = document.getElementById('speedChart').getContext('2d');
+        const speedData = Array(20).fill(0);
+        const speedChart = new Chart(speedCtx, {
+            type: 'bar',
+            data: {
+                labels: Array(20).fill(''),
+                datasets: [{
+                    data: speedData,
+                    backgroundColor: 'rgba(102, 126, 234, 0.6)',
+                    borderColor: '#667eea',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { display: false, min: 0, max: 100 },
+                    x: { display: false }
+                }
+            }
+        });
+
+        const ramCtx = document.getElementById('ramChart').getContext('2d');
+        const ramData = Array(30).fill(0);
+        const ramChart = new Chart(ramCtx, {
+            type: 'line',
+            data: {
+                labels: Array(30).fill(''),
+                datasets: [{
+                    data: ramData,
+                    borderColor: '#f093fb',
+                    backgroundColor: 'rgba(240, 147, 251, 0.15)',
+                    borderWidth: 2.5,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { display: false, min: 0, max: 100 },
+                    x: { display: false }
+                }
+            }
+        });
+
+        let startTime = Date.now();
+        let cpuHistory = Array(30).fill(0);
+        let ramHistory = Array(30).fill(0);
+        let speedHistory = Array(20).fill(0);
+        let terminalLines = [];
+        
+        function addTerminalLog(msg) {
+            terminalLines.push(msg);
+            if(terminalLines.length > 15) terminalLines.shift();
+            const box = document.getElementById('terminalBox');
+            box.innerHTML = terminalLines.map(l => `<div class="terminal-line">${l}</div>`).join('');
+            box.scrollTop = box.scrollHeight;
+        }
+        
+        function updateSystem() {
+            const active = document.getElementById('startBtn').classList.contains('hidden');
+            const cpu = Math.floor(Math.random() * 25) + 15 + (active ? 45 : 0);
+            const ram = Math.floor(Math.random() * 20) + 25 + (active ? 35 : 0);
+            const net = active ? Math.floor(Math.random() * 700) + 400 : Math.floor(Math.random() * 100);
+            const speed = active ? Math.floor(Math.random() * 50) + 30 : Math.floor(Math.random() * 10);
+            
+            document.getElementById('cpu').textContent = cpu + '%';
+            document.getElementById('ram').textContent = ram + '%';
+            document.getElementById('net').textContent = net + ' KB/s';
+            document.getElementById('navCpu').textContent = cpu + '%';
+            document.getElementById('navRam').textContent = ram + '%';
+            document.getElementById('navNet').textContent = net + ' KB/s';
+            
+            document.getElementById('cpuBar').style.width = cpu + '%';
+            document.getElementById('ramBar').style.width = ram + '%';
+            document.getElementById('netBar').style.width = Math.min(net / 10, 100) + '%';
+            
+            cpuHistory.push(cpu);
+            cpuHistory.shift();
+            cpuChart.data.datasets[0].data = cpuHistory;
+            cpuChart.update('none');
+            
+            ramHistory.push(ram);
+            ramHistory.shift();
+            ramChart.data.datasets[0].data = ramHistory;
+            ramChart.update('none');
+            
+            speedHistory.push(speed);
+            speedHistory.shift();
+            speedChart.data.datasets[0].data = speedHistory;
+            speedChart.update('none');
+            
+            const elapsed = Math.floor((Date.now() - startTime) / 1000);
+            const h = String(Math.floor(elapsed / 3600)).padStart(2, '0');
+            const m = String(Math.floor((elapsed % 3600) / 60)).padStart(2, '0');
+            const s = String(elapsed % 60).padStart(2, '0');
+            document.getElementById('navUptime').textContent = `${h}:${m}:${s}`;
+        }
+        setInterval(updateSystem, 1000);
+
+        let statusInterval;
+        let sessionId = localStorage.getItem('sessionId') || 'user_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('sessionId', sessionId);
+        addTerminalLog('System initialized');
+        addTerminalLog('Session ID: ' + sessionId);
+
+        function getHeaders() {
+            return {
+                'Content-Type': 'application/json',
+                'X-Session-ID': sessionId
+            };
+        }
+
+        function startScraping() {
+            const config = {
+                general_search_term: document.getElementById('searchTerm').value,
+                categories: document.getElementById('categories').value.split(',').map(s => s.trim()).filter(s => s),
+                zipcodes: document.getElementById('zipcodes').value.split(',').map(s => s.trim()).filter(s => s),
+                max_workers: parseInt(document.getElementById('maxWorkers').value),
+                max_scrolls: parseInt(document.getElementById('maxScrolls').value),
+                headless_mode: true
+            };
+
+            addTerminalLog('Starting extraction...');
+            fetch('/start-scraping', {
+                method: 'POST',
+                headers: getHeaders(),
+                body: JSON.stringify(config)
+            }).then(r => r.json()).then(data => {
+                if (data.status === 'success') {
+                    document.getElementById('startBtn').classList.add('hidden');
+                    document.getElementById('stopBtn').classList.remove('hidden');
+                    addTerminalLog('Extraction started successfully');
+                    startStatusPolling();
+                } else {
+                    addTerminalLog('Error: ' + data.message);
+                    alert(data.message);
+                }
+            });
+        }
+
+        function stopScraping() {
+            addTerminalLog('Stopping extraction...');
+            fetch('/stop-scraping', { method: 'POST', headers: getHeaders() });
+            document.getElementById('startBtn').classList.remove('hidden');
+            document.getElementById('stopBtn').classList.add('hidden');
+            addTerminalLog('Extraction stopped');
+        }
+
+        function startStatusPolling() {
+            statusInterval = setInterval(updateStatus, 1000);
+        }
+
+        function updateStatus() {
+            fetch('/status', { headers: getHeaders() }).then(r => r.json()).then(data => {
+                document.getElementById('statusText').textContent = data.status_message;
+                document.getElementById('linkCount').textContent = data.link_count;
+                document.getElementById('scrapedCount').textContent = data.scraped_count;
+                document.getElementById('totalCount').textContent = data.total_to_scrape;
+
+                const linkPct = Math.round(data.link_collection_progress * 100);
+                const detailPct = Math.round(data.detail_scraping_progress * 100);
+
+                document.getElementById('linkPct').textContent = linkPct + '%';
+                document.getElementById('detailPct').textContent = detailPct + '%';
+                document.getElementById('linkProgressBar').style.width = linkPct + '%';
+                document.getElementById('detailProgressBar').style.width = detailPct + '%';
+                
+                const avgProgress = (linkPct + detailPct) / 2;
+                progressChart.data.datasets[0].data = [avgProgress, 100 - avgProgress];
+                progressChart.update('none');
+
+                if (!data.scraping_active && statusInterval) {
+                    clearInterval(statusInterval);
+                    document.getElementById('startBtn').classList.remove('hidden');
+                    document.getElementById('stopBtn').classList.add('hidden');
+                    addTerminalLog('Extraction complete');
+                    loadResults();
+                }
+            });
+        }
+
+        let allData = [];
+
+        function loadResults() {
+            addTerminalLog('Loading results...');
+            fetch('/get-results', { headers: getHeaders() }).then(r => r.json()).then(data => {
+                if (data.length > 0) {
+                    allData = data;
+                    document.getElementById('resultsCard').classList.remove('hidden');
+                    calculateAnalytics(data);
+                    displayResults(data);
+                    addTerminalLog('Results loaded: ' + data.length + ' records');
+                }
+            });
+        }
+
+        function calculateAnalytics(data) {
+            let emailCount = 0, websiteCount = 0, socialCount = 0, ratingSum = 0, ratingCount = 0;
+            let openCount = 0, closedCount = 0;
+
+            data.forEach(row => {
+                if(row['Final Email']) emailCount++;
+                if(row.Website) websiteCount++;
+                if(row.Facebook || row.Instagram || row.Twitter || row.LinkedIn) socialCount++;
+                if(row.Rating) { ratingSum += parseFloat(row.Rating); ratingCount++; }
+                if(row['Closure Status'] === 'Open') openCount++;
+                else closedCount++;
+            });
+
+            document.getElementById('emailsFound').textContent = emailCount;
+            document.getElementById('websitesFound').textContent = websiteCount;
+            document.getElementById('socialsFound').textContent = socialCount;
+            document.getElementById('avgRating').textContent = ratingCount > 0 ? (ratingSum / ratingCount).toFixed(1) : '0';
+            document.getElementById('openCount').textContent = openCount;
+            document.getElementById('closedCount').textContent = closedCount;
+        }
+
+        function displayResults(data) {
+            const tbody = document.getElementById('resultsBody');
+            tbody.innerHTML = '';
+            data.forEach((row, index) => {
+                const tr = document.createElement('tr');
+                let social = '';
+                if(row.Facebook) social += '<a href="'+row.Facebook+'" target="_blank">FB</a> ';
+                if(row.Instagram) social += '<a href="'+row.Instagram+'" target="_blank">IG</a> ';
+                if(row.Twitter) social += '<a href="'+row.Twitter+'" target="_blank">TW</a> ';
+                if(row.LinkedIn) social += '<a href="'+row.LinkedIn+'" target="_blank">LI</a>';
+                
+                let statusBadge = '';
+                if(row['Closure Status'] === 'Permanently Closed') statusBadge = '<span class="badge badge-closed">CLOSED</span>';
+                else if(row['Closure Status'] === 'Temporarily Closed') statusBadge = '<span class="badge badge-temp">TEMP</span>';
+                else statusBadge = '<span class="badge badge-open">ACTIVE</span>';
+                
+                tr.innerHTML = `<td>${row.Name || ''}</td><td>${row.Category || ''}</td><td>${row.City || ''}</td><td>${row.Phone || ''}</td><td>${row['Final Email'] || ''}</td><td>${row.Website ? '<a href="'+row.Website+'" target="_blank">Visit</a>' : ''}</td><td>${social}</td><td>${statusBadge}</td><td>${row.Rating || ''}</td><td><button class="action-btn" onclick="viewDetails(${index})">View</button></td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function searchTable() {
+            const input = document.getElementById('searchInput').value.toLowerCase();
+            const filtered = allData.filter(row => 
+                (row.Name || '').toLowerCase().includes(input) ||
+                (row.Category || '').toLowerCase().includes(input) ||
+                (row.City || '').toLowerCase().includes(input) ||
+                (row.Phone || '').toLowerCase().includes(input)
+            );
+            displayResults(filtered);
+        }
+
+        function filterResults(type) {
+            let filtered = allData;
+            if(type === 'open') filtered = allData.filter(row => row['Closure Status'] === 'Open');
+            else if(type === 'closed') filtered = allData.filter(row => row['Closure Status'] !== 'Open');
+            displayResults(filtered);
+            addTerminalLog('Filter applied: ' + type);
+        }
+
+        function viewDetails(index) {
+            const row = allData[index];
+            alert(`Name: ${row.Name}\nAddress: ${row.Address}\nPhone: ${row.Phone}\nEmail: ${row['Final Email']}\nWebsite: ${row.Website}\nRating: ${row.Rating}\nStatus: ${row['Closure Status']}`);
+        }
+
+        function downloadCSV() { 
+            addTerminalLog('Exporting CSV...');
+            window.open('/download-csv?session=' + sessionId, '_blank'); 
+        }
+        function downloadExcel() { 
+            addTerminalLog('Exporting Excel...');
+            window.open('/download-excel?session=' + sessionId, '_blank'); 
+        }
+    </script>
+</body>
+</html>

@@ -7,3 +7,13 @@ webdriver-manager
 xlsxwriter
 openpyxl
 gunicorn
+beautifulsoup4
+lxml
+aiohttp
+email-validator
+numpy
+scikit-learn
+textblob
+nltk
+transformers
+torch
